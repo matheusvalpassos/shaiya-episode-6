@@ -8,4 +8,6 @@ namespace hook
     void main_stats();
     void packet();
     void patch();
+	void item_icon();
+	void name_color();
 }
