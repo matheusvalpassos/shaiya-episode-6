@@ -13,14 +13,25 @@ using namespace shaiya;
 
 extern "C" void draw_aura(CItem* item, long x, long y)
 {
+    // Proteção anti-crash para slots vazios do inventário
+    if (!item || item->type == 0)
+        return;
+
     if (item->type == static_cast<uint8_t>(RealType::Lapis) || item->type == static_cast<uint8_t>(RealType::Other))
         return;
 
+    // Calcula o canto inferior direito (metade de 32x32)
+    long cornerX = x + 16;
+    long cornerY = y + 16;
+
     for (const auto& typeId : item->gems)
     {
+        if (typeId == 0) continue; // Pula espaços vazios na arma
+
         if ((typeId == 106 || typeId == 107) && item->type == static_cast<uint8_t>(RealType::Boots))
         {
-            Static::DrawRect(0x50FFFF00, x, y, 32, 32);
+            // Desenha 16x16 no canto
+            Static::DrawRect(0x50FFFF00, cornerX, cornerY, 16, 16);
             return;
         }
 
@@ -32,19 +43,19 @@ extern "C" void draw_aura(CItem* item, long x, long y)
         {
         case Attribute::Fire1:
         case Attribute::Fire2:
-            Static::DrawRect(0x50FF0000, x, y, 32, 32);
+            Static::DrawRect(0x50FF0000, cornerX, cornerY, 16, 16);
             return;
         case Attribute::Water1:
         case Attribute::Water2:
-            Static::DrawRect(0x5000FFFF, x, y, 32, 32);
+            Static::DrawRect(0x5000FFFF, cornerX, cornerY, 16, 16);
             return;
         case Attribute::Earth1:
         case Attribute::Earth2:
-            Static::DrawRect(0x5000FF00, x, y, 32, 32);
+            Static::DrawRect(0x5000FF00, cornerX, cornerY, 16, 16);
             return;
         case Attribute::Wind1:
         case Attribute::Wind2:
-            Static::DrawRect(0x50FFFFFF, x, y, 32, 32);
+            Static::DrawRect(0x50FFFFFF, cornerX, cornerY, 16, 16);
             return;
         default:
             continue;
@@ -59,19 +70,19 @@ extern "C" void draw_aura(CItem* item, long x, long y)
     {
     case Attribute::Fire1:
     case Attribute::Fire2:
-        Static::DrawRect(0x50FF0000, x, y, 32, 32);
+        Static::DrawRect(0x50FF0000, cornerX, cornerY, 16, 16);
         break;
     case Attribute::Water1:
     case Attribute::Water2:
-        Static::DrawRect(0x5000FFFF, x, y, 32, 32);
+        Static::DrawRect(0x5000FFFF, cornerX, cornerY, 16, 16);
         break;
     case Attribute::Earth1:
     case Attribute::Earth2:
-        Static::DrawRect(0x5000FF00, x, y, 32, 32);
+        Static::DrawRect(0x5000FF00, cornerX, cornerY, 16, 16);
         break;
     case Attribute::Wind1:
     case Attribute::Wind2:
-        Static::DrawRect(0x50FFFFFF, x, y, 32, 32);
+        Static::DrawRect(0x50FFFFFF, cornerX, cornerY, 16, 16);
         break;
     default:
         break;
