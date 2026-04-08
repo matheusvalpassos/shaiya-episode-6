@@ -63,6 +63,7 @@ void hook_0x426948(CUser* user, CUser* target)
         outgoing.grow = user->grow;
         outgoing.kills = user->kills;
 
+        // Mantemos 17 aqui, porque o cliente original só sabe desenhar 17 itens no modelo 3D
         for (int slot = 0; slot < 17; ++slot)
         {
             auto& item = user->inventory[0][slot];
@@ -73,6 +74,18 @@ void hook_0x426948(CUser* user, CUser* target)
             outgoing.equipment[slot].typeId = item->typeId;
             outgoing.equipment[slot].enchantStep = CItem::GetEnchantStep(item);
         }
+
+        // ---------------------------------------------------------
+        // SISTEMA DE WEAPON SKIN / TRANSMOG
+        // ---------------------------------------------------------
+        auto& weaponSkin = user->inventory[0][18]; // 18 = Slot da Skin
+        if (weaponSkin)
+        {
+            // Substitui o visual da arma real (Slot 5) pela Skin (Slot 18)
+            outgoing.equipment[5].type = weaponSkin->type;
+            outgoing.equipment[5].typeId = weaponSkin->typeId;
+        }
+        // ---------------------------------------------------------
 
         outgoing.charName = user->charName;
         int length = sizeof(GameGetInfoUserShapeOutgoing_EP6_4);
@@ -160,6 +173,18 @@ void hook_0x491B13(CUser* user)
             outgoing.equipment[slot].enchantStep = CItem::GetEnchantStep(item);
         }
 
+        // ---------------------------------------------------------
+        // SISTEMA DE WEAPON SKIN / TRANSMOG
+        // ---------------------------------------------------------
+        auto& weaponSkin = user->inventory[0][18]; // 18 = Slot da Skin
+        if (weaponSkin)
+        {
+            // Substitui o visual da arma real (Slot 5) pela Skin (Slot 18)
+            outgoing.equipment[5].type = weaponSkin->type;
+            outgoing.equipment[5].typeId = weaponSkin->typeId;
+        }
+        // ---------------------------------------------------------
+
         outgoing.charName = user->charName;
         int length = sizeof(GameGetInfoUserShapeOutgoing_EP6_4);
 
@@ -199,14 +224,18 @@ void hook_0x477D4F(CUser* user, CUser* target)
         if (!item)
             continue;
 
-        // Remove this condition if the inspection window supports 17 items
-        if (slot < ItemEquipment::Wings)
+        // ---------------------------------------------------------
+        // EXPANSÃO DA JANELA DE INSPEÇÃO (Ver até 20 itens)
+        // Alterado de: if (slot < ItemEquipment::Wings)
+        // ---------------------------------------------------------
+        if (slot < 20)
         {
             unit->slot = slot;
             unit->type = item->type;
             unit->typeId = item->typeId;
 
-            if (slot < ItemEquipment::Vehicle)
+            // No Kutekat, o Vehicle geralmente é o slot 13.
+            if (slot < 13)
                 unit->quality = item->quality;
 
             unit->gems = item->gems;
@@ -227,11 +256,11 @@ void __declspec(naked) naked_0x426948()
     __asm
     {
         pushad
-        
+
         push ebp // target
         push ebx // user
         call hook_0x426948
-        add esp,0x8
+        add esp, 0x8
 
         popad
 
@@ -251,8 +280,8 @@ void __declspec(naked) naked_0x491B13()
 
         push ebp // user
         call hook_0x491B13
-        add esp,0x4
-        
+        add esp, 0x4
+
         popad
 
         jmp u0x491EBF
@@ -269,7 +298,7 @@ void __declspec(naked) naked_0x477D4F()
         push eax // target
         push edi // user
         call hook_0x477D4F
-        add esp,0x8
+        add esp, 0x8
 
         popad
 
