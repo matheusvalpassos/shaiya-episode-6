@@ -75,6 +75,18 @@ bool hook_0x468385(CUser* user, CItem* item, ItemInfo* itemInfo, int slot)
         return itemType == ItemType::Costume;
     case ItemEquipment::Wings:
         return itemType == ItemType::Wings;
+
+        // -------------------------------------------------------------
+        // NOSSOS NOVOS SLOTS (17, 18, 19)
+        // -------------------------------------------------------------
+    case 17: // Artefato
+        return itemInfo->type == 97; // Altera o 97 para o TypeID da tua DB
+    case 18: // Weapon Skin
+        return itemInfo->type == 98; // Altera o 98 para o TypeID da tua DB
+    case 19: // Type 99 (Exclusivo)
+        return itemInfo->type == 99; // Altera o 99 para o TypeID da tua DB
+        // -------------------------------------------------------------
+
     default:
         break;
     }
@@ -92,7 +104,10 @@ void hook_0x4614E3(CUser* user)
 
     user->initStatusFlag = true;
 
-    for (int slot = 0; slot < 17; ++slot)
+    // -------------------------------------------------------------
+    // ALTERADO DE 17 PARA 20 (Para carregar os teus novos itens ao logar)
+    // -------------------------------------------------------------
+    for (int slot = 0; slot < 20; ++slot)
     {
         auto& item = user->inventory[0][slot];
         if (!item)
@@ -147,15 +162,15 @@ void __declspec(naked) naked_0x468385()
         push ebx // item
         push edi // user
         call hook_0x468385
-        add esp,0x10
-        test al,al
+        add esp, 0x10
+        test al, al
 
         popad
 
         je _0x468535
         jmp u0x46846B
 
-        _0x468535:
+        _0x468535 :
         jmp u0x468535
     }
 }
@@ -169,7 +184,7 @@ void __declspec(naked) naked_0x4614E3()
 
         push esi // user
         call hook_0x4614E3
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
@@ -186,12 +201,12 @@ void __declspec(naked) naked_0x46166E()
 
         push edi // user
         call hook_0x46166E
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
         // original
-        cmp byte ptr [edi+0x5855],0x0
+        cmp byte ptr[edi + 0x5855], 0x0
         jmp u0x461675
     }
 }
@@ -205,12 +220,12 @@ void __declspec(naked) naked_0x461D43()
 
         push edi // user
         call hook_0x461D43
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
         // original
-        cmp byte ptr [edi+0x5855],0x0
+        cmp byte ptr[edi + 0x5855], 0x0
         jmp u0x461D4A
     }
 }
@@ -226,20 +241,24 @@ void hook::user_equipment()
     // CUser::ItemEquipmentRem
     util::detour((void*)0x461D43, naked_0x461D43, 7);
 
+    // -------------------------------------------------------------
+    // ALTERADO TODOS OS LIMITADORES DE 17 PARA 20!
+    // -------------------------------------------------------------
+    uint8_t MAX_SLOTS = 20;
+
     // CUser::InitEquipment (overload)
-    util::write_memory((void*)0x4615B3, 17, 1);
+    util::write_memory((void*)0x4615B3, &MAX_SLOTS, 1);
     // CUser::ItemBagToBag
-    util::write_memory((void*)0x46862D, 17, 1);
-    util::write_memory((void*)0x468722, 17, 1);
-    util::write_memory((void*)0x4688B0, 17, 1);
-    util::write_memory((void*)0x468955, 17, 1);
-    util::write_memory((void*)0x468A2B, 17, 1);
-    util::write_memory((void*)0x468B5D, 17, 1);
+    util::write_memory((void*)0x46862D, &MAX_SLOTS, 1);
+    util::write_memory((void*)0x468722, &MAX_SLOTS, 1);
+    util::write_memory((void*)0x4688B0, &MAX_SLOTS, 1);
+    util::write_memory((void*)0x468955, &MAX_SLOTS, 1);
+    util::write_memory((void*)0x468A2B, &MAX_SLOTS, 1);
+    util::write_memory((void*)0x468B5D, &MAX_SLOTS, 1);
     // CUser::ClearEquipment
-    util::write_memory((void*)0x46BCCF, 17, 1);
+    util::write_memory((void*)0x46BCCF, &MAX_SLOTS, 1);
     // CUser::PacketAdminCmdD (0xF901)
-    // The client does not support more than 13 items (thanks, xarel)
-    //util::write_memory((void*)0x482896, 17, 1);
+    // util::write_memory((void*)0x482896, &MAX_SLOTS, 1);
 
     // Change 0x199 to 0x62A0 (&itemQualityLv)
     int x62A0 = 0x62A0;
