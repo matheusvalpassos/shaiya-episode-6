@@ -3,16 +3,8 @@
 #include <windows.h>
 #include "util/util.h"
 
-char alloc_new_dds_1[16];
-
-DWORD set_tga_position = 0x631BE0;
-DWORD load_interface_elements = 0x57B560;
-
 UINT8 max_slot[] = { 20 };
-
-// ---------------------------------------------------------
-// LAYOUT CENTRALIZADO DA COMUNIDADE (ESTILO EP8)
-// ---------------------------------------------------------
+UINT8 long_jmp_patch[] = { 0x90, 0xE9 };
 float inventory_item_pos[40] = {
     108.0f, 48.0f,  // 0: Helmet 
     108.0f, 100.0f, // 1: Armor 
@@ -177,13 +169,13 @@ __declspec(naked) void load_dds_size()
 
 namespace hook
 {
-    void inventory_expansion()
+    void newslots()
     {
         util::detour((void*)0x4E825C, slot_packet, 9);
         util::detour((void*)0x59F0D1, fix_visual_bug, 8);
         util::detour((void*)0x4B5348, load_icon, 5);
         util::detour((void*)0x4B53EA, load_dds_size, 5);
-        //util::JumpRel32((void*)0x004B53C3, (void*)0x004B53EA, 8);
+
         util::write_memory((void*)(0x51909D + 2), max_slot, 1);
         util::write_memory((void*)(0x518596 + 2), max_slot, 1);
         util::write_memory((void*)(0x51A26E + 2), max_slot, 1);
@@ -192,9 +184,11 @@ namespace hook
 
         util::write_memory((void*)(0x4E8255 + 1), max_slot, 1);
         util::write_memory((void*)(0x4FEC1A + 1), max_slot, 1);
-        util::write_memory((void*)(0x4F4195 + 2), max_slot, 1); // Comes from itemmall fix
+        util::write_memory((void*)(0x4F4195 + 2), max_slot, 1);
 
         util::detour((void*)0x5183D0, inventory_item_equipment, 7);
         util::detour((void*)0x51A212, inventory_item_equipment_mouse_over, 6);
+
+        util::write_memory((void*)0x00517830, long_jmp_patch, 2);
     }
 }

@@ -6,7 +6,7 @@ void DllExport()
 {
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, void* lpReserved)
 {
     switch (dwReason)
     {

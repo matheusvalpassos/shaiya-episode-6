@@ -1,30 +1,32 @@
 #include <util/util.h>
 #include "include/main.h"
 #include "include/shaiya/CCharacter.h"
-#include "include/shaiya/ChatType.h"
 #include "include/shaiya/Static.h"
 using namespace shaiya;
 
-// Resolves an issue with disguise removal
-void hook_0x5933F8(CCharacter* user)
+namespace packet
 {
-    if (!user->equipment.type[14])
-        CCharacter::RemovePet(user);
+    // Resolves an issue with disguise removal
+    void hook_0x303(CCharacter* user)
+    {
+        if (!user->equipment.type[ItemSlot::Pet])
+            CCharacter::RemovePet(user);
 
-    if (!user->equipment.type[15])
-        CCharacter::RemoveCostume(user);
+        if (!user->equipment.type[ItemSlot::Costume])
+            CCharacter::RemoveCostume(user);
 
-    if (!user->equipment.type[16])
-        CCharacter::RemoveWings(user);
-}
+        if (!user->equipment.type[ItemSlot::Wings])
+            CCharacter::RemoveWings(user);
+    }
 
-// Adds support for system message 509
-void hook_0x4EF2F3(CCharacter* killer, unsigned killCount)
-{
-    std::memcpy(g_var->sysmsg_t.data(), killer->charName.data(), killer->charName.size());
-    g_var->sysmsg_t[killer->charName.size() - 1] = '\0';
-    g_var->sysmsg_v = killCount;
-    Static::SysMsgToChatBox(ChatType::Default, 509, 1);
+    // Adds support for system message 509
+    void hook_0x229(CCharacter* killer, unsigned killCount)
+    {
+        std::memcpy(g_var->sysmsg_t.data(), killer->charName.data(), killer->charName.size());
+        g_var->sysmsg_t[killer->charName.size() - 1] = '\0';
+        g_var->sysmsg_v = killCount;
+        Static::SysMsgToChatBox(static_cast<ChatType>(1), 509, 1);
+    }
 }
 
 unsigned u0x59F8AF = 0x59F8AF;
@@ -61,7 +63,7 @@ void __declspec(naked) naked_0x5933F8()
         pushad
 
         push esi // user
-        call hook_0x5933F8
+        call packet::hook_0x303
         add esp,0x4
 
         popad
@@ -82,7 +84,7 @@ void __declspec(naked) naked_0x4EF2F3()
 
         push ebx // killCount
         push edi // killer
-        call hook_0x4EF2F3
+        call packet::hook_0x229
         add esp,0x8
 
         popad

@@ -210,7 +210,7 @@ void __declspec(naked) naked_0x531F97()
 
         push esi // window
         call hook_0x531F97
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
@@ -227,12 +227,12 @@ void __declspec(naked) naked_0x532A23()
 
         push esi // window
         call hook_0x532A23
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
         // original
-        mov ecx,[esp+0x108]
+        mov ecx, [esp + 0x108]
         jmp u0x532A2A
     }
 }
@@ -243,11 +243,11 @@ void __declspec(naked) naked_0x531810()
     {
         pushad
 
-        sub ecx,0x2C
+        sub ecx, 0x2C
 
         push ecx // window
         call hook_0x531810
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
@@ -263,23 +263,23 @@ void __declspec(naked) naked_0x531A74()
 
         push esi // window
         call hook_0x531A74
-        add esp,0x4
-        test eax,eax
+        add esp, 0x4
+        test eax, eax
 
         popad
 
         je original
 
-        mov eax,0x1
+        mov eax, 0x1
         pop esi
         pop ecx
         ret
 
-        original:
-        xor eax,eax
-        pop esi
-        pop ecx
-        ret
+        original :
+        xor eax, eax
+            pop esi
+            pop ecx
+            ret
     }
 }
 
@@ -292,13 +292,13 @@ void __declspec(naked) naked_0x5320E6()
 
         push esi // window
         call hook_0x5320E6
-        add esp,0x4
+        add esp, 0x4
 
         popad
 
         // original
-        mov eax,[esi+0x40]
-        xor edi,edi
+        mov eax, [esi + 0x40]
+        xor edi, edi
         jmp u0x5320F3
     }
 }
